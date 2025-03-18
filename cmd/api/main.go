@@ -20,6 +20,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/nathancamolez-dev/go-orbit/internal/api"
+	"github.com/nathancamolez-dev/go-orbit/internal/functions"
 )
 
 func main() {
@@ -87,7 +88,9 @@ func run(ctx context.Context) error {
 	s.Cookie.SameSite = http.SameSiteLaxMode
 
 	api := api.API{
-		Router: chi.NewRouter(),
+		Router:        chi.NewRouter(),
+		GoalFunctions: functions.NewGoalFunctions(pool),
+		Sessions:      s,
 	}
 
 	api.BindRoutes()
@@ -95,6 +98,7 @@ func run(ctx context.Context) error {
 	logger.Info("Starting a server on port 8080")
 
 	if err := http.ListenAndServe("localhost:8080", api.Router); err != nil {
+		zap.Error(err)
 		panic(err)
 	}
 
