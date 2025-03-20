@@ -11,6 +11,7 @@ func (api *API) BindRoutes() {
 	api.Router.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Post("/goals", api.handleCreateGoal)
+			r.Post("/completions", api.handleCompleteGoal)
 		})
 	})
 }

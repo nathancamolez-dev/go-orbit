@@ -2,8 +2,10 @@ package functions
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
@@ -39,5 +41,33 @@ func (gf *GoalFunctions) CreateGoal(
 	}
 	fmt.Println("Goal created successfully")
 	return nil
+
+}
+
+func (gf *GoalFunctions) CompleteGoal(
+	ctx context.Context,
+	goalId string) error {
+	pendingWeekGoals, err := gf.queries.GetGoalsCreatedThisWeekAndPending(ctx)
+	if err != nil {
+		zap.Error(err)
+		return err
+	}
+	goalID, err := uuid.Parse(goalId)
+	if err != nil {
+		zap.Error(err)
+		return err
+	}
+
+	for _, goal := range pendingWeekGoals {
+		if goal.ID == goalID {
+			if err := gf.queries.CompleteGoal(ctx, goalID); err != nil {
+				zap.Error(err)
+				return err
+			}
+			return nil
+		}
+	}
+
+	return errors.New("Goal not found")
 
 }

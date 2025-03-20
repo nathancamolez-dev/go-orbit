@@ -17,28 +17,26 @@ WITH GoalsCreatedThisWeek AS (
         createdAt >= date_trunc('week', CURRENT_DATE) 
         AND createdAt < date_trunc('week', CURRENT_DATE) + interval '1 week'
 ),
-PendingGoals AS (
+CompletionCounts AS (
     SELECT 
         g.id, 
         g.title, 
         g.desiredWeeklyFrequency, 
         g.createdAt, 
-        COALESCE(COUNT(gc.goalsId), 0) AS completion_count
+        COALESCE(COUNT(gc.goalId), 0) AS completion_count
     FROM 
-        goals g
+        GoalsCreatedThisWeek g
     LEFT JOIN 
-        goalsCompletions gc ON g.id = gc.goalsId
+        goalsCompletions gc ON g.id = gc.goalId
     GROUP BY 
         g.id, g.title, g.desiredWeeklyFrequency, g.createdAt
-    HAVING 
-        COALESCE(COUNT(gc.goalsId), 0) < g.desiredWeeklyFrequency
 )
 SELECT 
-    gtw.id, 
-    gtw.title, 
-    gtw.desiredWeeklyFrequency, 
-    gtw.createdAt
+    cc.id, 
+    cc.title, 
+    cc.desiredWeeklyFrequency, 
+    cc.createdAt
 FROM 
-    GoalsCreatedThisWeek gtw
-JOIN 
-    PendingGoals pg ON gtw.id = pg.id;
+    CompletionCounts cc
+WHERE 
+    cc.completion_count < cc.desiredWeeklyFrequency;
