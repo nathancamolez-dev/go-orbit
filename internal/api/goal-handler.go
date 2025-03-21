@@ -1,10 +1,12 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"go.uber.org/zap"
 
+	"github.com/nathancamolez-dev/go-orbit/internal/functions"
 	"github.com/nathancamolez-dev/go-orbit/internal/jsonutils"
 	goal "github.com/nathancamolez-dev/go-orbit/internal/usecases/goal"
 )
@@ -52,9 +54,16 @@ func (api *API) handleCompleteGoal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := api.GoalFunctions.CompleteGoal(r.Context(), data.GoalID); err != nil {
+		if errors.Is(err, functions.ErrNoGoal) {
+			jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{
+				"error": err.Error(),
+			})
+			return
+
+		}
+		zap.Error(err)
 		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
-			"error":   "Internal Server Error",
-			"message": err.Error(),
+			"error": "Internal Server Error",
 		})
 		return
 	}

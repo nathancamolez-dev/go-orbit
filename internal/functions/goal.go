@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
@@ -44,11 +45,16 @@ func (gf *GoalFunctions) CreateGoal(
 
 }
 
+var ErrNoGoal = errors.New("This are not created this week, or is not pending")
+
 func (gf *GoalFunctions) CompleteGoal(
 	ctx context.Context,
 	goalId string) error {
 	pendingWeekGoals, err := gf.queries.GetGoalsCreatedThisWeekAndPending(ctx)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrNoGoal
+		}
 		zap.Error(err)
 		return err
 	}
@@ -68,6 +74,6 @@ func (gf *GoalFunctions) CompleteGoal(
 		}
 	}
 
-	return errors.New("Goal not found")
+	return ErrNoGoal
 
 }
