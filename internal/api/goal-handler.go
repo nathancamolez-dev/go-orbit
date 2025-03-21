@@ -36,6 +36,7 @@ func (api *API) handleCreateGoal(w http.ResponseWriter, r *http.Request) {
 	jsonutils.EncodeJson(w, r, http.StatusCreated, map[string]any{
 		"Message": "Goal create successfully",
 	})
+	return
 
 }
 
@@ -71,4 +72,17 @@ func (api *API) handleCompleteGoal(w http.ResponseWriter, r *http.Request) {
 	jsonutils.EncodeJson(w, r, http.StatusOK, map[string]any{
 		"Message": "Goal completed successfully",
 	})
+	return
+}
+
+func (api *API) handleGetWeekSummary(w http.ResponseWriter, r *http.Request) {
+	weekSummary, err := api.GoalFunctions.GetWeekSummary(r.Context())
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
+			"Error": "Internal server error",
+		})
+		return
+	}
+	jsonutils.EncodeJson(w, r, http.StatusOK, weekSummary)
+	return
 }

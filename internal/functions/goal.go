@@ -77,3 +77,14 @@ func (gf *GoalFunctions) CompleteGoal(
 	return ErrNoGoal
 
 }
+
+func (gf *GoalFunctions) GetWeekSummary(
+	ctx context.Context,
+) (weekSummary []pgstore.GetWeekSummaryRow, err error) {
+	weekSummary, err = gf.queries.GetWeekSummary(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return weekSummary, nil
+}

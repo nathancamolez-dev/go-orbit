@@ -40,3 +40,21 @@ FROM
     CompletionCounts cc
 WHERE 
     cc.completion_count < cc.desiredWeeklyFrequency;
+
+
+-- name: GetWeekSummary :many
+SELECT 
+    g.title,
+    g.desiredWeeklyFrequency,
+    COUNT(gc.id) AS completion_count
+FROM 
+    goals g
+LEFT JOIN 
+    goalsCompletions gc ON g.id = gc.goalId
+WHERE 
+    g.createdAt >= date_trunc('week', current_date) 
+    AND g.createdAt < date_trunc('week', current_date) + interval '1 week'
+GROUP BY 
+    g.id, g.title, g.desiredWeeklyFrequency
+ORDER BY 
+    g.title;

@@ -106,3 +106,47 @@ func (q *Queries) GetGoalsCreatedThisWeekAndPending(ctx context.Context) ([]GetG
 	}
 	return items, nil
 }
+
+const getWeekSummary = `-- name: GetWeekSummary :many
+SELECT 
+    g.title,
+    g.desiredWeeklyFrequency,
+    COUNT(gc.id) AS completion_count
+FROM 
+    goals g
+LEFT JOIN 
+    goalsCompletions gc ON g.id = gc.goalId
+WHERE 
+    g.createdAt >= date_trunc('week', current_date) 
+    AND g.createdAt < date_trunc('week', current_date) + interval '1 week'
+GROUP BY 
+    g.id, g.title, g.desiredWeeklyFrequency
+ORDER BY 
+    g.title
+`
+
+type GetWeekSummaryRow struct {
+	Title                  string `json:"title"`
+	Desiredweeklyfrequency int32  `json:"desiredweeklyfrequency"`
+	CompletionCount        int64  `json:"completion_count"`
+}
+
+func (q *Queries) GetWeekSummary(ctx context.Context) ([]GetWeekSummaryRow, error) {
+	rows, err := q.db.Query(ctx, getWeekSummary)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetWeekSummaryRow
+	for rows.Next() {
+		var i GetWeekSummaryRow
+		if err := rows.Scan(&i.Title, &i.Desiredweeklyfrequency, &i.CompletionCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
