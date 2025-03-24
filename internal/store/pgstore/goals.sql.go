@@ -68,7 +68,8 @@ SELECT
     cc.id, 
     cc.title, 
     cc.desiredWeeklyFrequency, 
-    cc.createdAt
+    cc.createdAt,
+    cc.completion_count
 FROM 
     CompletionCounts cc
 WHERE 
@@ -76,10 +77,11 @@ WHERE
 `
 
 type GetGoalsCreatedThisWeekAndPendingRow struct {
-	ID                     uuid.UUID `json:"id"`
-	Title                  string    `json:"title"`
-	Desiredweeklyfrequency int32     `json:"desiredweeklyfrequency"`
-	Createdat              time.Time `json:"createdat"`
+	ID                     uuid.UUID   `json:"id"`
+	Title                  string      `json:"title"`
+	Desiredweeklyfrequency int32       `json:"desiredweeklyfrequency"`
+	Createdat              time.Time   `json:"createdat"`
+	CompletionCount        interface{} `json:"completion_count"`
 }
 
 func (q *Queries) GetGoalsCreatedThisWeekAndPending(ctx context.Context) ([]GetGoalsCreatedThisWeekAndPendingRow, error) {
@@ -96,6 +98,7 @@ func (q *Queries) GetGoalsCreatedThisWeekAndPending(ctx context.Context) ([]GetG
 			&i.Title,
 			&i.Desiredweeklyfrequency,
 			&i.Createdat,
+			&i.CompletionCount,
 		); err != nil {
 			return nil, err
 		}

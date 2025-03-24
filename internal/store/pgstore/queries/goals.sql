@@ -35,7 +35,8 @@ SELECT
     cc.id, 
     cc.title, 
     cc.desiredWeeklyFrequency, 
-    cc.createdAt
+    cc.createdAt,
+    cc.completion_count
 FROM 
     CompletionCounts cc
 WHERE 

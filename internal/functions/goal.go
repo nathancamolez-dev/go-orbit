@@ -91,8 +91,8 @@ func (gf *GoalFunctions) GetWeekSummary(
 
 func (gf *GoalFunctions) GetWeekPendingGoals(
 	ctx context.Context,
-) (weekPendingGoals []pgstore.GetWeekSummaryRow, err error) {
-	weekPendingGoals, err = gf.queries.GetWeekSummary(ctx)
+) (weekPendingGoals []pgstore.GetGoalsCreatedThisWeekAndPendingRow, err error) {
+	weekPendingGoals, err = gf.queries.GetGoalsCreatedThisWeekAndPending(ctx)
 	if err != nil {
 		return nil, err
 	}

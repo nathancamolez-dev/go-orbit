@@ -13,6 +13,7 @@ func (api *API) BindRoutes() {
 			r.Post("/goals", api.handleCreateGoal)
 			r.Post("/completions", api.handleCompleteGoal)
 			r.Get("/summary", api.handleGetWeekSummary)
+			r.Get("/pending-goals", api.handleGetPendingGoals)
 		})
 	})
 }

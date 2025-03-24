@@ -86,3 +86,22 @@ func (api *API) handleGetWeekSummary(w http.ResponseWriter, r *http.Request) {
 	jsonutils.EncodeJson(w, r, http.StatusOK, weekSummary)
 	return
 }
+
+func (api *API) handleGetPendingGoals(w http.ResponseWriter, r *http.Request) {
+	pendingGoals, err := api.GoalFunctions.GetWeekPendingGoals(r.Context())
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusInternalServerError, map[string]any{
+			"Error": "Internal server error",
+		})
+		return
+	}
+
+	if pendingGoals == nil {
+		jsonutils.EncodeJson(w, r, http.StatusOK, map[string]any{
+			"Message": "You have no pending goals in this week",
+		})
+		return
+	}
+	jsonutils.EncodeJson(w, r, http.StatusOK, pendingGoals)
+	return
+}
