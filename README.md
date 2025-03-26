@@ -1,6 +1,6 @@
 # in.orbit API in Go
 
-Same Api that you can find in \[in.orbit\](https://www.github.com/nathancamolez-dev/in.orbit-back-end-/) but in writed in Go.
+Same Api that you can find in [in.orbit](https://www.github.com/nathancamolez-dev/in.orbit-back-end-/) but in writed in Go.
 
 ## Install
 
